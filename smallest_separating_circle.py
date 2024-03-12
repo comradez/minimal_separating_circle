@@ -17,7 +17,7 @@ def find_maximal_surrounding_circle(points: npt.NDArray[np.float32]) -> Circle:
 
 def find_minimal_separating_circle(
     red_points: npt.NDArray[np.float32], blue_points: npt.NDArray[np.float32]
-) -> Circle:
+) -> tuple[Circle, list[npt.NDArray[np.float32]]]:
 
     def inv_lerp(
         a: npt.NDArray[np.float32],
@@ -33,6 +33,8 @@ def find_minimal_separating_circle(
     smallest_sep_circle_center: npt.NDArray[np.float32] = None
     smallest_sep_circle_radius = float("inf")
     smallest_sep_circle_blue_point_num = 0x7FFFFFFF
+    
+    all_event_points = []
 
     for edge in red_fvd.edges:
         # the two vertices of the edge
@@ -66,6 +68,8 @@ def find_minimal_separating_circle(
 
         # sort the event points from ei to ej
         event_points.sort(key=lambda x: x[0])
+        
+        all_event_points.extend([event_point for _, _, event_point in event_points])
 
         # The circle with ei already separates the points
         if len(blue_points_in_circle) <= smallest_sep_circle_blue_point_num:
@@ -113,4 +117,4 @@ def find_minimal_separating_circle(
                 if smallest_sep_circle_blue_point_num == 0:
                     break
 
-    return Circle(smallest_sep_circle_center, smallest_sep_circle_radius)
+    return Circle(smallest_sep_circle_center, smallest_sep_circle_radius), all_event_points
